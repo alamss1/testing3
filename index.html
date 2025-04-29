@@ -1,64 +1,47 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Form Absen Karyawan</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absensi QR</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
 <body>
-  <h1>Absen Karyawan</h1>
-  <form id="absenForm">
-    <label for="namaKaryawan">Nama Karyawan:</label>
-    <input type="text" id="namaKaryawan" name="namaKaryawan" required><br><br>
+    <h1>Scan QR untuk Absen Masuk</h1>
+    <div id="reader" style="width:300px"></div>
 
-    <label for="jamMasuk">Jam Masuk:</label>
-    <input type="time" id="jamMasuk" name="jamMasuk" required><br><br>
+    <script>
+        function sendAbsensi(nama, id) {
+            fetch("https://script.google.com/macros/s/AKfycbwWUrJibT5-midkLMW3I4NVHTHKP6cfiAE_rfgYJTx2_rN2CBxpt2h2sT0FJy5a/exec
+", {
+                method: "POST",
+                contentType: "application/json",
+                body: JSON.stringify({ nama: nama, id: id })
+            })
+            .then(response => response.text())
+            .then(result => {
+                alert("Absen berhasil!");
+                window.location.reload();
+            })
+            .catch(error => {
+                alert("Gagal absen: " + error);
+            });
+        }
 
-    <label for="jamKeluar">Jam Keluar:</label>
-    <input type="time" id="jamKeluar" name="jamKeluar" required><br><br>
+        function onScanSuccess(decodedText, decodedResult) {
+            console.log(`Scan result: ${decodedText}`);
+            
+            // Misalnya QR isinya "Nama;ID"
+            const parts = decodedText.split(";");
+            const nama = parts[0];
+            const id = parts[1];
+            
+            sendAbsensi(nama, id);
+        }
 
-    <label for="status">Status:</label>
-    <select id="status" name="status">
-      <option value="Hadir">Hadir</option>
-      <option value="Izin">Izin</option>
-      <option value="Sakit">Sakit</option>
-      <option value="Cuti">Cuti</option>
-    </select><br><br>
-
-    <button type="submit">Absen</button>
-  </form>
-
-  <script>
-    document.getElementById("absenForm").addEventListener("submit", function(event){
-      event.preventDefault();
-      
-      var namaKaryawan = document.getElementById("namaKaryawan").value;
-      var jamMasuk = document.getElementById("jamMasuk").value;
-      var jamKeluar = document.getElementById("jamKeluar").value;
-      var status = document.getElementById("status").value;
-      
-      var data = {
-        namaKaryawan: namaKaryawan,
-        jamMasuk: jamMasuk,
-        jamKeluar: jamKeluar,
-        status: status
-      };
-      
-      fetch('https://script.google.com/macros/s/AKfycbzehuHRiV6Rub9geHGyxeNBL89AZhoOJMo6q5mFgmr8JduQCoBRzHPRsDII6Zx7et8-/exec', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      })
-      .then(response => response.json())
-      .then(data => {
-        alert('Absen berhasil!');
-      })
-      .catch((error) => {
-        alert('Gagal absen: ' + error);
-      });
-    });
-  </script>
+        const html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader", { fps: 10, qrbox: 250 });
+        html5QrcodeScanner.render(onScanSuccess);
+    </script>
 </body>
 </html>
