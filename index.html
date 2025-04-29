@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form Absen Karyawan</title>
+</head>
+<body>
+  <h1>Absen Karyawan</h1>
+  <form id="absenForm">
+    <label for="namaKaryawan">Nama Karyawan:</label>
+    <input type="text" id="namaKaryawan" name="namaKaryawan" required><br><br>
+
+    <label for="jamMasuk">Jam Masuk:</label>
+    <input type="time" id="jamMasuk" name="jamMasuk" required><br><br>
+
+    <label for="jamKeluar">Jam Keluar:</label>
+    <input type="time" id="jamKeluar" name="jamKeluar" required><br><br>
+
+    <label for="status">Status:</label>
+    <select id="status" name="status">
+      <option value="Hadir">Hadir</option>
+      <option value="Izin">Izin</option>
+      <option value="Sakit">Sakit</option>
+      <option value="Cuti">Cuti</option>
+    </select><br><br>
+
+    <button type="submit">Absen</button>
+  </form>
+
+  <script>
+    document.getElementById("absenForm").addEventListener("submit", function(event){
+      event.preventDefault();
+      
+      var namaKaryawan = document.getElementById("namaKaryawan").value;
+      var jamMasuk = document.getElementById("jamMasuk").value;
+      var jamKeluar = document.getElementById("jamKeluar").value;
+      var status = document.getElementById("status").value;
+      
+      var data = {
+        namaKaryawan: namaKaryawan,
+        jamMasuk: jamMasuk,
+        jamKeluar: jamKeluar,
+        status: status
+      };
+      
+      fetch('https://script.google.com/macros/s/AKfycbzehuHRiV6Rub9geHGyxeNBL89AZhoOJMo6q5mFgmr8JduQCoBRzHPRsDII6Zx7et8-/exec', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert('Absen berhasil!');
+      })
+      .catch((error) => {
+        alert('Gagal absen: ' + error);
+      });
+    });
+  </script>
+</body>
+</html>
