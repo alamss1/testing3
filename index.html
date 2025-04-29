@@ -2,46 +2,44 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Absensi QR</title>
+    <title>Absensi RANAP</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
 <body>
-    <h1>Scan QR untuk Absen Masuk</h1>
-    <div id="reader" style="width:300px"></div>
+    <h1>Absensi Masuk</h1>
+    <div id="status">Menyiapkan absensi...</div>
 
     <script>
-        function sendAbsensi(nama, id) {
+        // Ambil parameter dari URL
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        const id = getQueryParam("id");
+        const nama = getQueryParam("nama");
+
+        if (id && nama) {
+            document.getElementById("status").innerText = `Mengirim data absen untuk ${nama}...`;
+
             fetch("https://script.google.com/macros/s/AKfycbwWUrJibT5-midkLMW3I4NVHTHKP6cfiAE_rfgYJTx2_rN2CBxpt2h2sT0FJy5a/exec
 ", {
                 method: "POST",
                 contentType: "application/json",
-                body: JSON.stringify({ nama: nama, id: id })
+                body: JSON.stringify({ id: id, nama: nama })
             })
             .then(response => response.text())
             .then(result => {
-                alert("Absen berhasil!");
-                window.location.reload();
+                document.getElementById("status").innerText = "✅ Absen berhasil!";
             })
             .catch(error => {
-                alert("Gagal absen: " + error);
+                document.getElementById("status").innerText = "❌ Gagal absen!";
+                console.error(error);
             });
+        } else {
+            document.getElementById("status").innerText = "❗ Parameter tidak lengkap di URL!";
         }
-
-        function onScanSuccess(decodedText, decodedResult) {
-            console.log(`Scan result: ${decodedText}`);
-            
-            // Misalnya QR isinya "Nama;ID"
-            const parts = decodedText.split(";");
-            const nama = parts[0];
-            const id = parts[1];
-            
-            sendAbsensi(nama, id);
-        }
-
-        const html5QrcodeScanner = new Html5QrcodeScanner(
-            "reader", { fps: 10, qrbox: 250 });
-        html5QrcodeScanner.render(onScanSuccess);
     </script>
 </body>
 </html>
+``
