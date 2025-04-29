@@ -9,11 +9,12 @@
     <div id="status">Mengirim data absen...</div>
 
     <form id="absenForm">
+        <!-- Form ini hanya menampilkan data yang diterima dari URL, jadi tidak perlu input manual -->
         <label for="id">ID Pegawai:</label><br>
-        <input type="text" id="id" name="id" required><br><br>
+        <input type="text" id="id" name="id" readonly><br><br>
 
         <label for="nama">Nama Pegawai:</label><br>
-        <input type="text" id="nama" name="nama" required><br><br>
+        <input type="text" id="nama" name="nama" readonly><br><br>
 
         <label for="tanggal_masuk">Tanggal Masuk:</label><br>
         <input type="date" id="tanggal_masuk" name="tanggal_masuk" required><br><br>
@@ -35,27 +36,37 @@
     </form>
 
     <script>
+        // Ambil parameter dari URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+        const nama = urlParams.get('nama');
+
+        // Isi form dengan data yang diambil dari URL
+        document.getElementById('id').value = id;
+        document.getElementById('nama').value = nama;
+
+        // Kirim data ke Google Script ketika form disubmit
         document.getElementById('absenForm').addEventListener('submit', function(event) {
             event.preventDefault();  // Mencegah form submit standar
 
             // Ambil nilai dari form
-            const id = document.getElementById('id').value;
-            const nama = document.getElementById('nama').value;
+            const idPegawai = document.getElementById('id').value;
+            const namaPegawai = document.getElementById('nama').value;
             const tanggalMasuk = document.getElementById('tanggal_masuk').value;
             const waktuMasuk = document.getElementById('waktu_masuk').value;
             const waktuKeluar = document.getElementById('waktu_keluar').value;
             const status = document.getElementById('status').value;
 
             // Kirim data ke Google Script
-            fetch('https://script.google.com/macros/s/AKfycbwM0dfO0FPJiWsFY4agHiJVRv5JvnhQjp2Zoi-ibKdfy_aKR3I1eUTRkDoAdiO1PxMqGQ/exec', {
+            fetch('https://script.google.com/macros/s/AKfycbzUyCrruK2bd1G_7O_Q0m4lbk4U_ahpUJ553nQENSXCG3tXPBhi11KO_xEEH64N6_0X/exec', {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    id: id,
-                    nama: nama,
+                    id: idPegawai,
+                    nama: namaPegawai,
                     tanggal_masuk: tanggalMasuk,
                     waktu_masuk: waktuMasuk,
                     waktu_keluar: waktuKeluar,
