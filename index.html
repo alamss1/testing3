@@ -1,48 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Absensi QR</title>
-    <style>
-        body { font-family: sans-serif; padding: 30px; }
-        #status { font-size: 18px; }
-    </style>
+    <title>Absen Pegawai Rawat Inap</title>
 </head>
 <body>
-    <h1>Absensi Masuk</h1>
-    <div id="status">Menyiapkan absensi...</div>
+    <h2>Absen Pegawai Rawat Inap</h2>
+    <div id="status">Mengirim data absen...</div>
+
+    <form id="absenForm">
+        <label for="id">ID Pegawai:</label><br>
+        <input type="text" id="id" name="id" required><br><br>
+
+        <label for="nama">Nama Pegawai:</label><br>
+        <input type="text" id="nama" name="nama" required><br><br>
+
+        <label for="tanggal_masuk">Tanggal Masuk:</label><br>
+        <input type="date" id="tanggal_masuk" name="tanggal_masuk" required><br><br>
+
+        <label for="waktu_masuk">Waktu Masuk:</label><br>
+        <input type="time" id="waktu_masuk" name="waktu_masuk" required><br><br>
+
+        <label for="waktu_keluar">Waktu Keluar:</label><br>
+        <input type="time" id="waktu_keluar" name="waktu_keluar" required><br><br>
+
+        <label for="status">Status Kehadiran:</label><br>
+        <select id="status" name="status" required>
+            <option value="Hadir">Hadir</option>
+            <option value="Cuti">Cuti</option>
+            <option value="Sakit">Sakit</option>
+        </select><br><br>
+
+        <button type="submit">Kirim Absen</button>
+    </form>
 
     <script>
-        // Ambil data dari parameter URL
-        function getParam(key) {
-            const params = new URLSearchParams(window.location.search);
-            return params.get(key);
-        }
+        document.getElementById('absenForm').addEventListener('submit', function(event) {
+            event.preventDefault();  // Mencegah form submit standar
 
-        const id = getParam("id");
-        const nama = getParam("nama");
+            // Ambil nilai dari form
+            const id = document.getElementById('id').value;
+            const nama = document.getElementById('nama').value;
+            const tanggalMasuk = document.getElementById('tanggal_masuk').value;
+            const waktuMasuk = document.getElementById('waktu_masuk').value;
+            const waktuKeluar = document.getElementById('waktu_keluar').value;
+            const status = document.getElementById('status').value;
 
-        if (id && nama) {
-            document.getElementById("status").innerText = `Mengirim data absensi untuk ${nama}...`;
-
-            fetch("https://script.google.com/macros/s/AKfycbyihWhKx9OTRwtEWbfBObl4QofjET3jR6UswAkH4jX2XBTGxpXtnH3TZArSTbZETzmDtw/exec", {
-                method: "POST",
+            // Kirim data ke Google Script
+            fetch('https://script.google.com/macros/s/AKfycbwM0dfO0FPJiWsFY4agHiJVRv5JvnhQjp2Zoi-ibKdfy_aKR3I1eUTRkDoAdiO1PxMqGQ/exec', {
+                method: 'POST',
+                mode: 'no-cors',
                 headers: {
-                    "Content-Type": "application/json"
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ id: id, nama: nama })
-            })
-            .then(response => response.text())
-            .then(result => {
-                document.getElementById("status").innerText = "✅ Absen berhasil!";
-            })
-            .catch(error => {
-                document.getElementById("status").innerText = "❌ Gagal mengirim absen!";
-                console.error("Error:", error);
+                body: JSON.stringify({
+                    id: id,
+                    nama: nama,
+                    tanggal_masuk: tanggalMasuk,
+                    waktu_masuk: waktuMasuk,
+                    waktu_keluar: waktuKeluar,
+                    status: status
+                })
+            }).then(response => {
+                document.getElementById('status').innerText = 'Absen berhasil!';
+            }).catch(error => {
+                document.getElementById('status').innerText = 'Gagal mengirim absen.';
             });
-        } else {
-            document.getElementById("status").innerText = "❗ URL tidak lengkap (harus ada ?id=...&nama=...)";
-        }
+        });
     </script>
 </body>
 </html>
