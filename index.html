@@ -2,30 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Absensi RANAP</title>
-    <script src="https://unpkg.com/html5-qrcode"></script>
+    <title>Absensi QR</title>
+    <style>
+        body { font-family: sans-serif; padding: 30px; }
+        #status { font-size: 18px; }
+    </style>
 </head>
 <body>
     <h1>Absensi Masuk</h1>
     <div id="status">Menyiapkan absensi...</div>
 
     <script>
-        // Ambil parameter dari URL
-        function getQueryParam(param) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(param);
+        // Ambil data dari parameter URL
+        function getParam(key) {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(key);
         }
 
-        const id = getQueryParam("id");
-        const nama = getQueryParam("nama");
+        const id = getParam("id");
+        const nama = getParam("nama");
 
         if (id && nama) {
-            document.getElementById("status").innerText = `Mengirim data absen untuk ${nama}...`;
+            document.getElementById("status").innerText = `Mengirim data absensi untuk ${nama}...`;
 
-            fetch("https://script.google.com/macros/s/AKfycbwWUrJibT5-midkLMW3I4NVHTHKP6cfiAE_rfgYJTx2_rN2CBxpt2h2sT0FJy5a/exec
-", {
+            fetch("https://script.google.com/macros/s/AKfycbyibBUZ_DzdM5n2zIDSSjczxDroglFEVECoQyADojY5B-d6WGceqH0I04La1-aEUPUA8A/exec", {
                 method: "POST",
-                contentType: "application/json",
+                headers: {
+                    "Content-Type": "application/json"
+                },
                 body: JSON.stringify({ id: id, nama: nama })
             })
             .then(response => response.text())
@@ -33,13 +37,12 @@
                 document.getElementById("status").innerText = "✅ Absen berhasil!";
             })
             .catch(error => {
-                document.getElementById("status").innerText = "❌ Gagal absen!";
-                console.error(error);
+                document.getElementById("status").innerText = "❌ Gagal mengirim absen!";
+                console.error("Error:", error);
             });
         } else {
-            document.getElementById("status").innerText = "❗ Parameter tidak lengkap di URL!";
+            document.getElementById("status").innerText = "❗ URL tidak lengkap (harus ada ?id=...&nama=...)";
         }
     </script>
 </body>
 </html>
-``
